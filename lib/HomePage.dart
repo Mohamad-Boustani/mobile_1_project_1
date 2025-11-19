@@ -101,6 +101,23 @@ class _HomePageState extends State<HomePage> {
               "Balance LBP: ",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
+            SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.add_circle_outline),
+                  label: Text("Add Transaction"),
+                ),
+                SizedBox(width: 50),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.account_balance_wallet_rounded),
+                  label: Text("View Transactions"),
+                ),
+              ],
+            ),
           ],
         ),
       ),
