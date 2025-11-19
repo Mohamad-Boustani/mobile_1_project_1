@@ -10,6 +10,9 @@ class AddTransaction extends StatefulWidget {
 }
 
 class _AddTransactionState extends State<AddTransaction> {
+  TextEditingController contAm = TextEditingController();
+  TextEditingController contN = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +25,34 @@ class _AddTransactionState extends State<AddTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Add a new transaction"),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          TextField(
+            controller: contAm,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              label: Text("Enter The Amount"),
+              border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          TextField(
+            controller: contN,
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(
+              label: Text("Enter A Note"),
+              border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

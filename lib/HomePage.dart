@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("Daily Summary"),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.indigo,
       ),
       body: Center(
         child: Column(
@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               "Today’s Income \$: ",
               style: TextStyle(
@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 24,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               "Today’s Expenses \$:",
               style: TextStyle(
@@ -61,12 +61,12 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 24,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               "Balance \$: ",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Title(
               color: Colors.indigo,
               child: const Text(
@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               "Today’s Income LBP: ",
               style: TextStyle(
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 24,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               "Today’s Expenses LBP:",
               style: TextStyle(
@@ -96,12 +96,12 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 24,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               "Balance LBP: ",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
-            SizedBox(height: 10,),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -109,12 +109,20 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {},
                   icon: Icon(Icons.add_circle_outline),
                   label: Text("Add Transaction"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
                 SizedBox(width: 50),
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: Icon(Icons.account_balance_wallet_rounded),
                   label: Text("View Transactions"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ],
             ),
