@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Data.dart';
+import 'package:mobile/HomePage.dart';
+import 'package:mobile/TransactionList.dart';
 
 import 'Transaction.dart';
 
@@ -15,8 +17,8 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends State<AddTransaction> {
   TextEditingController contAm = TextEditingController();
   TextEditingController contN = TextEditingController();
-  Transaction? selectedcurrency;
-  Transaction? selectedtype;
+  String? selectedcurrency;
+  String? selectedtype;
 
   @override
   void initState() {
@@ -61,13 +63,13 @@ class _AddTransactionState extends State<AddTransaction> {
             width: 200,
             hintText: "Select Currency",
             dropdownMenuEntries: currencies.map<DropdownMenuEntry<String>>((
-              String c,
+              String currency,
             ) {
-              return DropdownMenuEntry(value: c, label: c);
+              return DropdownMenuEntry(value: currency, label: currency);
             }).toList(),
             onSelected: (c) {
               setState(() {
-                selectedcurrency?.currency = c as String;
+                selectedcurrency = c;
               });
             },
           ),
@@ -76,13 +78,13 @@ class _AddTransactionState extends State<AddTransaction> {
             width: 200,
             hintText: "Select Type",
             dropdownMenuEntries: type.map<DropdownMenuEntry<String>>((
-              String c,
+              String type,
             ) {
-              return DropdownMenuEntry(value: c, label: c);
+              return DropdownMenuEntry(value: type, label: type);
             }).toList(),
-            onSelected: (c) {
+            onSelected: (t) {
               setState(() {
-                selectedtype?.type = c as String;
+                selectedtype = t;
               });
             },
           ),
@@ -91,7 +93,19 @@ class _AddTransactionState extends State<AddTransaction> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  contN.text = "";
+                  contAm.text = "";
+                  selectedcurrency = null;
+                  selectedtype = null;
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (b) {
+                        return HomePage();
+                      },
+                    ),
+                  );
+                },
                 icon: Icon(Icons.arrow_back_rounded),
                 label: const Text("Go To Home"),
                 style: ElevatedButton.styleFrom(
@@ -100,7 +114,27 @@ class _AddTransactionState extends State<AddTransaction> {
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Transaction tr = Transaction(
+                    double.parse(contAm.text),
+                    selectedtype!,
+                    selectedcurrency!,
+                    contN.text,
+                    DateTime.now(),
+                  );
+                  contN.text = "";
+                  contAm.text = "";
+                  selectedcurrency = null;
+                  selectedtype = null;
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (b) {
+                        return TransactionList();
+                      },
+                      settings: RouteSettings(arguments: tr),
+                    ),
+                  );
+                },
                 icon: Icon(Icons.save_rounded),
                 label: const Text("Save transaction"),
                 style: ElevatedButton.styleFrom(
@@ -109,7 +143,19 @@ class _AddTransactionState extends State<AddTransaction> {
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  contN.text = "";
+                  contAm.text = "";
+                  selectedcurrency = null;
+                  selectedtype = null;
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (b) {
+                        return TransactionList();
+                      },
+                    ),
+                  );
+                },
                 icon: Icon(Icons.arrow_forward_rounded),
                 label: const Text("View all transactions"),
                 style: ElevatedButton.styleFrom(

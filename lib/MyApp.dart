@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Daily Transaction Summary",
       debugShowCheckedModeBanner: false,
-      home: AddTransaction(),
+      home: HomePage(),
     );
   }
 }

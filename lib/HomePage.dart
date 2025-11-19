@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/AddTransactionPage.dart';
+
+import 'TransactionList.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -106,7 +109,15 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (b) {
+                            return AddTransaction();
+                          },
+                        )
+                    );
+                  },
                   icon: Icon(Icons.add_circle_outline),
                   label: Text("Add Transaction"),
                   style: ElevatedButton.styleFrom(
@@ -116,7 +127,15 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(width: 50),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (b) {
+                            return TransactionList();
+                          },
+                        )
+                    );
+                  },
                   icon: Icon(Icons.account_balance_wallet_rounded),
                   label: Text("View Transactions"),
                   style: ElevatedButton.styleFrom(
