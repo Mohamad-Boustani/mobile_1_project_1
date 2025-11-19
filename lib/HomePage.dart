@@ -32,8 +32,20 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             SizedBox(height: 30),
+            Title(
+              color: Colors.indigo,
+              child: const Text(
+                "USD Balance",
+                style: TextStyle(
+                  color: Colors.indigo,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             Text(
-              "Today’s Income:",
+              "Today’s Income \$: ",
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
@@ -42,7 +54,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 10),
             Text(
-              "Today’s Expenses:",
+              "Today’s Expenses \$:",
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -51,7 +63,42 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 10),
             Text(
-              "Balance:",
+              "Balance \$: ",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+            SizedBox(height: 30),
+            Title(
+              color: Colors.indigo,
+              child: const Text(
+                "LBP Balance",
+                style: TextStyle(
+                  color: Colors.indigo,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "Today’s Income LBP: ",
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Today’s Expenses LBP:",
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Balance LBP: ",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
           ],
