@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:mobile/AddTransactionPage.dart';
 import 'HomePage.dart';
 
 class MyApp extends StatelessWidget {
@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Daily Transaction Summary",
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: AddTransaction(),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/Data.dart';
 
 class AddTransaction extends StatefulWidget {
   AddTransaction({Key? key}) : super(key: key);
@@ -29,6 +30,7 @@ class _AddTransactionState extends State<AddTransaction> {
       appBar: AppBar(
         title: const Text("Add a new transaction"),
         centerTitle: true,
+        backgroundColor: Colors.indigo,
       ),
       body: Column(
         children: [
@@ -42,7 +44,15 @@ class _AddTransactionState extends State<AddTransaction> {
             ),
           ),
           const SizedBox(height: 10),
-
+          DropdownMenu(
+            width: 200,
+            hintText: "Select Currency",
+            dropdownMenuEntries: currencies.map<DropdownMenuEntry<String>>((
+                String c) {
+              return DropdownMenuEntry(value: c, label: c);
+            }).toList(),
+          ),
+          const SizedBox(height: 10),
           TextField(
             controller: contN,
             keyboardType: TextInputType.text,
