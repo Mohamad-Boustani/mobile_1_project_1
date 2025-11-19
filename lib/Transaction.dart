@@ -5,11 +5,10 @@ class Transaction {
   String? note;
   DateTime date;
 
-  Transaction({
-    required this.amount,
-    required this.type,
-    required this.currency,
-    this.note,
-    required this.date,
-  });
+  Transaction(this.amount, this.type, this.currency, this.note, this.date);
+
+  @override
+  String toString() {
+    return "Amount: $amount $currency - Type: $type - Date: $date - Note: $note";
+  }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Data.dart';
 
+import 'Transaction.dart';
+
 class AddTransaction extends StatefulWidget {
   AddTransaction({Key? key}) : super(key: key);
 
@@ -13,6 +15,8 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends State<AddTransaction> {
   TextEditingController contAm = TextEditingController();
   TextEditingController contN = TextEditingController();
+  Transaction? selectedcurrency;
+  Transaction? selectedtype;
 
   @override
   void initState() {
@@ -44,15 +48,6 @@ class _AddTransactionState extends State<AddTransaction> {
             ),
           ),
           const SizedBox(height: 10),
-          DropdownMenu(
-            width: 200,
-            hintText: "Select Currency",
-            dropdownMenuEntries: currencies.map<DropdownMenuEntry<String>>((
-                String c) {
-              return DropdownMenuEntry(value: c, label: c);
-            }).toList(),
-          ),
-          const SizedBox(height: 10),
           TextField(
             controller: contN,
             keyboardType: TextInputType.text,
@@ -60,6 +55,69 @@ class _AddTransactionState extends State<AddTransaction> {
               label: Text("Enter A Note"),
               border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
             ),
+          ),
+          const SizedBox(height: 10),
+          DropdownMenu(
+            width: 200,
+            hintText: "Select Currency",
+            dropdownMenuEntries: currencies.map<DropdownMenuEntry<String>>((
+              String c,
+            ) {
+              return DropdownMenuEntry(value: c, label: c);
+            }).toList(),
+            onSelected: (c) {
+              setState(() {
+                selectedcurrency?.currency = c as String;
+              });
+            },
+          ),
+          const SizedBox(height: 10),
+          DropdownMenu(
+            width: 200,
+            hintText: "Select Type",
+            dropdownMenuEntries: type.map<DropdownMenuEntry<String>>((
+              String c,
+            ) {
+              return DropdownMenuEntry(value: c, label: c);
+            }).toList(),
+            onSelected: (c) {
+              setState(() {
+                selectedtype?.type = c as String;
+              });
+            },
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.arrow_back_rounded),
+                label: const Text("Go To Home"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.indigo,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.save_rounded),
+                label: const Text("Save transaction"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.indigo,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.arrow_forward_rounded),
+                label: const Text("View all transactions"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.indigo,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
           ),
         ],
       ),
