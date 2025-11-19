@@ -17,8 +17,8 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends State<AddTransaction> {
   TextEditingController contAm = TextEditingController();
   TextEditingController contN = TextEditingController();
-  String? selectedcurrency;
-  String? selectedtype;
+  late String selectedcurrency;
+  late String selectedtype;
 
   @override
   void initState() {
@@ -69,7 +69,7 @@ class _AddTransactionState extends State<AddTransaction> {
             }).toList(),
             onSelected: (c) {
               setState(() {
-                selectedcurrency = c;
+                selectedcurrency = c!;
               });
             },
           ),
@@ -84,7 +84,7 @@ class _AddTransactionState extends State<AddTransaction> {
             }).toList(),
             onSelected: (t) {
               setState(() {
-                selectedtype = t;
+                selectedtype = t!;
               });
             },
           ),
@@ -96,8 +96,6 @@ class _AddTransactionState extends State<AddTransaction> {
                 onPressed: () {
                   contN.text = "";
                   contAm.text = "";
-                  selectedcurrency = null;
-                  selectedtype = null;
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (b) {
@@ -115,25 +113,21 @@ class _AddTransactionState extends State<AddTransaction> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  Transaction tr = Transaction(
-                    double.parse(contAm.text),
-                    selectedtype!,
-                    selectedcurrency!,
-                    contN.text,
-                    DateTime.now(),
-                  );
-                  contN.text = "";
-                  contAm.text = "";
-                  selectedcurrency = null;
-                  selectedtype = null;
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (b) {
-                        return TransactionList();
-                      },
-                      settings: RouteSettings(arguments: tr),
-                    ),
-                  );
+                  if (contAm.text.isNotEmpty &&
+                      contN.text.isNotEmpty &&
+                      selectedtype.isNotEmpty &&
+                      selectedcurrency.isNotEmpty) {
+                    Transaction tr = Transaction(
+                      double.parse(contAm.text),
+                      selectedtype,
+                      selectedcurrency,
+                      contN.text,
+                      DateTime.now(),
+                    );
+                    transactiondata.add(tr);
+                    contN.text = "";
+                    contAm.text = "";
+                  }
                 },
                 icon: Icon(Icons.save_rounded),
                 label: const Text("Save transaction"),
@@ -146,8 +140,7 @@ class _AddTransactionState extends State<AddTransaction> {
                 onPressed: () {
                   contN.text = "";
                   contAm.text = "";
-                  selectedcurrency = null;
-                  selectedtype = null;
+
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (b) {
