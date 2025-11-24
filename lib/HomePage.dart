@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/AddTransactionPage.dart';
-
 import 'TransactionList.dart';
+import 'Transaction.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -48,7 +48,9 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 20),
             Text(
-              "Today’s Income \$: ",
+              "Today’s Income \$: ${Transaction
+                  .totalIncome('USD')
+                  .toStringAsFixed(2)}",
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
@@ -57,7 +59,9 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 10),
             Text(
-              "Today’s Expenses \$:",
+              "Today’s Expenses \$: ${Transaction
+                  .totalExpenses('USD')
+                  .toStringAsFixed(2)}",
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -66,7 +70,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 10),
             Text(
-              "Balance \$: ",
+              "Balance \$: ${Transaction.balance('USD').toStringAsFixed(2)}",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
             const SizedBox(height: 30),
@@ -83,7 +87,9 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 20),
             Text(
-              "Today’s Income LBP: ",
+              "Today’s Income LBP: ${Transaction
+                  .totalIncome('LBP')
+                  .toStringAsFixed(2)}",
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
@@ -92,7 +98,9 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 10),
             Text(
-              "Today’s Expenses LBP:",
+              "Today’s Expenses LBP: ${Transaction
+                  .totalExpenses('LBP')
+                  .toStringAsFixed(2)}",
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -101,7 +109,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 10),
             Text(
-              "Balance LBP: ",
+              "Balance LBP: ${Transaction.balance('LBP').toStringAsFixed(2)}",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
             const SizedBox(height: 10),
