@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/Transaction.dart';
+import 'package:mobile/Data.dart';
+// import 'package:mobile/Transaction.dart';
 
 class TransactionList extends StatefulWidget {
   TransactionList({Key? key}) : super(key: key);
@@ -23,10 +24,14 @@ class _TransactionListState extends State<TransactionList> {
 
   @override
   Widget build(BuildContext context) {
-    var s = ModalRoute.of(context)?.settings.arguments as Transaction;
+    // var s = ModalRoute.of(context)?.settings.arguments as Transaction;
     return Scaffold(
       appBar: AppBar(title: const Text("Details of Every Transaction")),
-      body: Center(child: Text("${s.toString()}")),
+      body: ListView.builder(
+          itemCount: transactiondata.length,
+          itemBuilder: (b, index) {
+            return Text(transactiondata[index].toString());
+          }),
     );
   }
 }

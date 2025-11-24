@@ -119,10 +119,10 @@ class _AddTransactionState extends State<AddTransaction> {
                       selectedcurrency.isNotEmpty) {
                     Transaction tr = Transaction(
                       double.parse(contAm.text),
-                      selectedtype,
                       selectedcurrency,
-                      contN.text,
+                      selectedtype,
                       DateTime.now(),
+                      contN.text,
                     );
                     transactiondata.add(tr);
                     contN.text = "";

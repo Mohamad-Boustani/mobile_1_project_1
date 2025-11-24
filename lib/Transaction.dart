@@ -5,7 +5,7 @@ class Transaction {
   String? note;
   DateTime date;
 
-  Transaction(this.amount, this.type, this.currency, this.note, this.date);
+  Transaction(this.amount, this.currency, this.type, this.date, this.note);
 
   @override
   String toString() {
