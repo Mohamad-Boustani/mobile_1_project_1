@@ -8,17 +8,6 @@ Overview
 - Shows totals for income, expenses and balance per currency.
 - Screens: Home / Add Transaction / Transaction List.
 
-Quick setup
-
-1. Ensure you have Flutter installed and a device or emulator available.
-2. From the project root run:
-
-```powershell
-flutter pub get
-flutter analyze
-flutter run
-```
-
 Notes
 
 - The UI is basic and intended as a starter project.
@@ -26,8 +15,3 @@ Notes
 - To make the balances reactive after adding a transaction, the HomePage rebuilds on return from the
   Add Transaction screen.
 
-If you'd like, I can:
-
-- Add persistent storage (SQLite / Hive).
-- Improve formatting (locales, separators).
-- Add unit tests or CI configuration.
