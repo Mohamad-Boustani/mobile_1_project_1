@@ -1,2 +1,33 @@
 # Mobile_1_Project_1
-1st project in Mobile done by Mohamad Boustani using Android studio and uploaded to Github
+
+Simple personal finance Flutter app (first project by Mohamad Boustani).
+
+Overview
+
+- A small Flutter app to track transactions in multiple currencies (USD & LBP).
+- Shows totals for income, expenses and balance per currency.
+- Screens: Home / Add Transaction / Transaction List.
+
+Quick setup
+
+1. Ensure you have Flutter installed and a device or emulator available.
+2. From the project root run:
+
+```powershell
+flutter pub get
+flutter analyze
+flutter run
+```
+
+Notes
+
+- The UI is basic and intended as a starter project.
+- Data is currently held in-memory in `lib/Data.dart` (no persistence).
+- To make the balances reactive after adding a transaction, the HomePage rebuilds on return from the
+  Add Transaction screen.
+
+If you'd like, I can:
+
+- Add persistent storage (SQLite / Hive).
+- Improve formatting (locales, separators).
+- Add unit tests or CI configuration.
