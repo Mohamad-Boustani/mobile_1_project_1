@@ -27,11 +27,36 @@ class _TransactionListState extends State<TransactionList> {
     // var s = ModalRoute.of(context)?.settings.arguments as Transaction;
     return Scaffold(
       appBar: AppBar(title: const Text("Details of Every Transaction")),
+
       body: ListView.builder(
-          itemCount: transactiondata.length,
-          itemBuilder: (b, index) {
-            return Text(transactiondata[index].toString());
-          }),
+        itemCount: transactiondata.length,
+        itemBuilder: (b, index) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(
+                transactiondata[index].toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    transactiondata.removeAt(index);
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: Icon(Icons.delete_forever_rounded),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

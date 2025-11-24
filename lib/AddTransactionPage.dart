@@ -17,8 +17,8 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends State<AddTransaction> {
   TextEditingController contAm = TextEditingController();
   TextEditingController contN = TextEditingController();
-  late String selectedcurrency;
-  late String selectedtype;
+  String? selectedcurrency;
+  String selectedtype = "";
 
   @override
   void initState() {
@@ -61,6 +61,8 @@ class _AddTransactionState extends State<AddTransaction> {
           const SizedBox(height: 10),
           DropdownMenu(
             width: 200,
+            initialSelection: selectedcurrency,
+            // This line is crucial
             hintText: "Select Currency",
             dropdownMenuEntries: currencies.map<DropdownMenuEntry<String>>((
               String currency,
@@ -69,24 +71,35 @@ class _AddTransactionState extends State<AddTransaction> {
             }).toList(),
             onSelected: (c) {
               setState(() {
-                selectedcurrency = c!;
+                selectedcurrency = c;
               });
             },
           ),
           const SizedBox(height: 10),
-          DropdownMenu(
-            width: 200,
-            hintText: "Select Type",
-            dropdownMenuEntries: type.map<DropdownMenuEntry<String>>((
-              String type,
-            ) {
-              return DropdownMenuEntry(value: type, label: type);
-            }).toList(),
-            onSelected: (t) {
-              setState(() {
-                selectedtype = t!;
-              });
-            },
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Radio<String>(
+                value: "Income",
+                groupValue: selectedtype,
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedtype = value!;
+                  });
+                },
+              ),
+              const Text('Income'),
+              Radio<String>(
+                value: "Expenses",
+                groupValue: selectedtype,
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedtype = value!;
+                  });
+                },
+              ),
+              const Text('Expenses'),
+            ],
           ),
           const SizedBox(height: 20),
           Row(
@@ -94,8 +107,12 @@ class _AddTransactionState extends State<AddTransaction> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  contN.text = "";
-                  contAm.text = "";
+                  setState(() {
+                    contN.text = "";
+                    contAm.text = "";
+                    selectedtype = "";
+                    selectedcurrency = null;
+                  });
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (b) {
@@ -116,17 +133,21 @@ class _AddTransactionState extends State<AddTransaction> {
                   if (contAm.text.isNotEmpty &&
                       contN.text.isNotEmpty &&
                       selectedtype.isNotEmpty &&
-                      selectedcurrency.isNotEmpty) {
+                      selectedcurrency != null) {
                     Transaction tr = Transaction(
                       double.parse(contAm.text),
-                      selectedcurrency,
+                      selectedcurrency!,
                       selectedtype,
                       DateTime.now(),
                       contN.text,
                     );
                     transactiondata.add(tr);
-                    contN.text = "";
-                    contAm.text = "";
+                    setState(() {
+                      contN.text = "";
+                      contAm.text = "";
+                      selectedtype = "";
+                      selectedcurrency = null;
+                    });
                   }
                 },
                 icon: Icon(Icons.save_rounded),
@@ -138,9 +159,12 @@ class _AddTransactionState extends State<AddTransaction> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  contN.text = "";
-                  contAm.text = "";
-
+                  setState(() {
+                    contN.text = "";
+                    contAm.text = "";
+                    selectedtype = "";
+                    selectedcurrency = null;
+                  });
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (b) {

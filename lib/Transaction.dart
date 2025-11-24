@@ -9,6 +9,6 @@ class Transaction {
 
   @override
   String toString() {
-    return "Amount: $amount $currency - Type: $type - Date: $date - Note: $note";
+    return "Amount: $amount $currency - Type: $type - Date: $date \n Note: $note";
   }
 }
