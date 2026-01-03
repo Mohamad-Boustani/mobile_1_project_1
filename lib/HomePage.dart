@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mobile/AddTransactionPage.dart';
 import 'TransactionList.dart';
 import 'Transaction.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+const String kApiBase = 'http://bestenicsci410.atwebpages.com';
 
 class HomePage extends StatefulWidget {
   final VoidCallback onThemeToggle;
@@ -20,6 +24,28 @@ class _HomePageState extends State<HomePage> {
   bool _isLoggedIn = false;
   String _userName = '';
   bool _isLoading = false;
+  String? _errorMessage;
+  int? _userId;
+
+  Future<void> _loadTransactions() async {
+    if (_userId == null) return;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      final items = await Transaction.fetchTransactions(_userId!);
+      setState(() {
+        Transaction.transactiondata = items;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
 
   void _showAuthDialog() {
     showDialog(
@@ -35,9 +61,25 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             _isLoggedIn = true;
             _userName = result['userName'];
+            _userId = result['userId'];
           });
+          _loadTransactions();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Welcome, $_userName!')),
+            SnackBar(
+              backgroundColor:
+              Theme
+                  .of(context)
+                  .colorScheme
+                  .secondaryContainer,
+              content: Text(
+                'Welcome, $_userName!',
+                style: TextStyle(
+                    color: Theme
+                        .of(context)
+                        .colorScheme
+                        .onSecondaryContainer),
+              ),
+            ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -61,6 +103,42 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Daily Summary"),
+          centerTitle: true,
+          backgroundColor: Colors.indigo,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Daily Summary"),
+          centerTitle: true,
+          backgroundColor: Colors.indigo,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 12),
+              Text(_errorMessage!),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: _loadTransactions,
+                child: const Text('Retry'),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Daily Summary"),
@@ -75,9 +153,12 @@ class _HomePageState extends State<HomePage> {
               setState(() {
                 _isLoggedIn = false;
                 _userName = '';
+                _userId = null;
+                Transaction.transactiondata.clear();
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Logged out successfully')),
+                const SnackBar(
+                    content: Text('Logged out successfully')),
               );
             },
           ),
@@ -90,6 +171,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _isLoggedIn ? _loadTransactions : null,
+            tooltip: 'Refresh',
+          ),
           Tooltip(
             message: widget.isDarkMode ? 'Light Mode' : 'Dark Mode',
             child: IconButton(
@@ -113,16 +199,22 @@ class _HomePageState extends State<HomePage> {
                   elevation: 2,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
-                  color: Colors.indigo[50],
+                  color: Theme
+                      .of(context)
+                      .colorScheme
+                      .secondaryContainer,
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Text(
                       'Welcome, $_userName! 👋',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.indigo,
+                        color: Theme
+                            .of(context)
+                            .colorScheme
+                            .onSecondaryContainer,
                       ),
                     ),
                   ),
@@ -266,9 +358,10 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (b) => AddTransaction()),
-                      ).then((_) => setState(() {}));
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (b) =>
+                          AddTransaction(userId: _userId)))
+                          .then((_) => _loadTransactions());
                     },
                     icon: const Icon(Icons.add_circle_outline),
                     label: const Padding(
@@ -324,6 +417,9 @@ class AuthDialog extends StatefulWidget {
 class _AuthDialogState extends State<AuthDialog> {
   bool _isLoginMode = true;
   bool _isLoading = false;
+  bool _obscureLoginPassword = true;
+  bool _obscureRegisterPassword = true;
+  bool _obscureRegisterPasswordConfirm = true;
 
   // Login fields
   String _loginEmail = '';
@@ -345,14 +441,26 @@ class _AuthDialogState extends State<AuthDialog> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Call API login method
-      // final result = await AuthService.login(_loginEmail, _loginPassword);
-
-      // For now, simulating success
-      Navigator.of(context).pop({
-        'success': true,
-        'userName': _loginEmail.split('@')[0],
-      });
+      final url = Uri.parse('$kApiBase/login.php');
+      final res = await http.post(url,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(
+              {'login': _loginEmail, 'password': _loginPassword}));
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body);
+        if (data['success'] == true) {
+          final user = data['user'];
+          Navigator.of(context).pop({
+            'success': true,
+            'userName': user['Fullname'] ?? _loginEmail,
+            'userId': user['ID'],
+          });
+        } else {
+          _showError('Invalid credentials');
+        }
+      } else {
+        _showError('Server error');
+      }
     } catch (e) {
       _showError('Login failed: $e');
     } finally {
@@ -383,19 +491,31 @@ class _AuthDialogState extends State<AuthDialog> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Call API register method
-      // final result = await AuthService.register(
-      //   fullName: _registerFullName,
-      //   email: _registerEmail,
-      //   phone: _registerPhone,
-      //   password: _registerPassword,
-      // );
-
-      // For now, simulating success
-      Navigator.of(context).pop({
-        'success': true,
-        'userName': _registerFullName.split(' ')[0],
-      });
+      final url = Uri.parse('$kApiBase/register.php');
+      final res = await http.post(url,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            'fullname': _registerFullName,
+            'email': _registerEmail,
+            'phone': _registerPhone,
+            'password': _registerPassword,
+          }));
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body);
+        if (data['success'] == true) {
+          Navigator.of(context).pop({
+            'success': true,
+            'userName': _registerFullName.split(' ')[0],
+            'userId': null,
+          });
+        } else {
+          // Show specific error message from server
+          final errorMsg = data['message'] ?? 'Registration failed';
+          _showError(errorMsg);
+        }
+      } else {
+        _showError('Server error');
+      }
     } catch (e) {
       _showError('Registration failed: $e');
     } finally {
@@ -432,11 +552,18 @@ class _AuthDialogState extends State<AuthDialog> {
               const SizedBox(height: 12),
               TextField(
                 enabled: !_isLoading,
-                obscureText: true,
-                decoration: const InputDecoration(
+                obscureText: _obscureLoginPassword,
+                decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureLoginPassword ? Icons.visibility : Icons
+                        .visibility_off),
+                    onPressed: () =>
+                        setState(() =>
+                        _obscureLoginPassword = !_obscureLoginPassword),
+                  ),
                 ),
                 onChanged: (value) => _loginPassword = value,
               ),
@@ -475,22 +602,39 @@ class _AuthDialogState extends State<AuthDialog> {
                 const SizedBox(height: 12),
                 TextField(
                   enabled: !_isLoading,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _obscureRegisterPassword,
+                  decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                          _obscureRegisterPassword ? Icons.visibility : Icons
+                              .visibility_off),
+                      onPressed: () =>
+                          setState(() =>
+                          _obscureRegisterPassword = !_obscureRegisterPassword),
+                    ),
                   ),
                   onChanged: (value) => _registerPassword = value,
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   enabled: !_isLoading,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _obscureRegisterPasswordConfirm,
+                  decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureRegisterPasswordConfirm
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: () =>
+                          setState(() =>
+                          _obscureRegisterPasswordConfirm =
+                          !_obscureRegisterPasswordConfirm),
+                    ),
                   ),
                   onChanged: (value) => _registerPasswordConfirm = value,
                 ),

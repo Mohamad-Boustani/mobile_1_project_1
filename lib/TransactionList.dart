@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/Data.dart';
+import 'Transaction.dart';
 
 class TransactionList extends StatefulWidget {
   TransactionList({Key? key}) : super(key: key);
@@ -13,14 +13,14 @@ class TransactionList extends StatefulWidget {
 class _TransactionListState extends State<TransactionList> {
   late List<dynamic> _filteredTransactions;
   String _searchQuery = '';
+  String _dateQuery = '';
   String _filterType = 'All';
   String _filterCurrency = 'All';
-  bool _isSearching = false;
 
   @override
   void initState() {
     super.initState();
-    _filteredTransactions = transactiondata;
+    _filteredTransactions = Transaction.transactiondata;
   }
 
   void _updateSearch(String query) {
@@ -30,11 +30,28 @@ class _TransactionListState extends State<TransactionList> {
     });
   }
 
+  void _updateDateSearch(String query) {
+    setState(() {
+      _dateQuery = query.toLowerCase();
+      _applyFilters();
+    });
+  }
+
   void _applyFilters() {
-    _filteredTransactions = transactiondata.where((tr) {
+    _filteredTransactions = Transaction.transactiondata.where((tr) {
       // Search by note
-      bool matchesSearch = _searchQuery.isEmpty ||
+      final dateText = tr.date
+          .toLocal()
+          .toString()
+          .split('.')
+          .first
+          .toLowerCase();
+      bool matchesNoteSearch = _searchQuery.isEmpty ||
           (tr.note != null && tr.note!.toLowerCase().contains(_searchQuery));
+
+      // Search by date
+      bool matchesDateSearch = _dateQuery.isEmpty ||
+          dateText.contains(_dateQuery);
 
       // Filter by type
       bool matchesType = _filterType == 'All' || tr.type == _filterType;
@@ -43,7 +60,8 @@ class _TransactionListState extends State<TransactionList> {
       bool matchesCurrency =
           _filterCurrency == 'All' || tr.currency == _filterCurrency;
 
-      return matchesSearch && matchesType && matchesCurrency;
+      return matchesNoteSearch && matchesDateSearch && matchesType &&
+          matchesCurrency;
     }).toList();
   }
 
@@ -156,6 +174,27 @@ class _TransactionListState extends State<TransactionList> {
               onChanged: _updateSearch,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search by date (e.g., 2026-01-03)',
+                prefixIcon: const Icon(Icons.calendar_today),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                suffixIcon: _dateQuery.isNotEmpty
+                    ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _updateDateSearch('');
+                  },
+                )
+                    : null,
+              ),
+              onChanged: _updateDateSearch,
+            ),
+          ),
           // Active Filters Display
           if (_filterType != 'All' || _filterCurrency != 'All')
             Padding(
@@ -172,7 +211,10 @@ class _TransactionListState extends State<TransactionList> {
                           setState(() => _filterType = 'All');
                           _applyFilters();
                         },
-                        backgroundColor: Colors.indigo[100],
+                        backgroundColor: Theme
+                            .of(context)
+                            .colorScheme
+                            .secondaryContainer,
                       ),
                     ),
                   if (_filterCurrency != 'All')
@@ -183,7 +225,10 @@ class _TransactionListState extends State<TransactionList> {
                         setState(() => _filterCurrency = 'All');
                         _applyFilters();
                       },
-                      backgroundColor: Colors.indigo[100],
+                      backgroundColor: Theme
+                          .of(context)
+                          .colorScheme
+                          .secondaryContainer,
                     ),
                 ],
               ),
@@ -223,12 +268,15 @@ class _TransactionListState extends State<TransactionList> {
                           horizontal: 16, vertical: 12),
                       leading: CircleAvatar(
                         backgroundColor: tr.type == 'Income'
-                            ? Colors.green[50]
-                            : Colors.red[50],
+                            ? Colors.green.withOpacity(0.2)
+                            : Colors.red.withOpacity(0.2),
                         child: Text(tr.currency,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.bold)),
+                                fontWeight: FontWeight.bold,
+                                color: tr.type == 'Income'
+                                    ? Colors.green
+                                    : Colors.red)),
                       ),
                       title: Text(
                           '${tr.type} - ${tr.amount} ${tr.currency}',
@@ -270,12 +318,23 @@ class _TransactionListState extends State<TransactionList> {
                                 ),
                           );
                           if (confirm == true) {
-                            setState(() {
-                              transactiondata.remove(tr);
-                              _applyFilters();
-                            });
-                            // TODO: Call API delete method here
-                            // await TransactionService.deleteTransaction(tr.id);
+                            try {
+                              if (tr.id != null) {
+                                final ok = await Transaction
+                                    .deleteTransactionApi(tr.id!);
+                                if (!ok) {
+                                  throw Exception('Delete failed');
+                                }
+                              }
+                              setState(() {
+                                Transaction.transactiondata.remove(tr);
+                                _applyFilters();
+                              });
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: $e')),
+                              );
+                            }
                           }
                         },
                       ),
