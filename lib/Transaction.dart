@@ -1,5 +1,7 @@
 import 'Data.dart';
 
+const String _baseURL = 'bestenicsci410.atwebpages.com';
+
 class Transaction {
   double amount;
   String type;

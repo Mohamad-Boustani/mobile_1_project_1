@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Data.dart';
 import 'package:mobile/TransactionList.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'Transaction.dart';
 
@@ -18,6 +20,8 @@ class _AddTransactionState extends State<AddTransaction> {
   TextEditingController contN = TextEditingController();
   String? selectedcurrency;
   String selectedtype = "";
+  bool _isSaving = false;
+  int _userId = 1; // TODO: Get this from login/auth service
 
   @override
   void initState() {
@@ -27,6 +31,43 @@ class _AddTransactionState extends State<AddTransaction> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  // TODO: Replace this with actual API call to add_transaction.php
+  Future<bool> _addTransactionToApi(Transaction transaction) async {
+    try {
+      const String baseURL = 'http://bestenicsci410.atwebpages.com';
+      final response = await http.post(
+        Uri.parse('$baseURL/add_transaction.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'user_id': _userId,
+          'amount': transaction.amount,
+          'currency': transaction.currency,
+          'type': transaction.type,
+          'note': transaction.note ?? '',
+          'transaction_date': transaction.date.toIso8601String(),
+        }),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Connection timeout'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return jsonData['success'] == true;
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error adding transaction: $e');
+    }
   }
 
   @override
@@ -126,15 +167,36 @@ class _AddTransactionState extends State<AddTransaction> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: _isSaving ? null : () async {
                       if (contAm.text.isNotEmpty && selectedtype.isNotEmpty &&
                           selectedcurrency != null) {
                         final amt = double.tryParse(contAm.text);
                         if (amt != null) {
-                          final tr = Transaction(amt, selectedcurrency!,
-                              selectedtype, DateTime.now(), contN.text);
-                          transactiondata.add(tr);
-                          Navigator.of(context).pop();
+                          setState(() => _isSaving = true);
+                          try {
+                            final tr = Transaction(amt, selectedcurrency!,
+                                selectedtype, DateTime.now(),
+                                contN.text.isEmpty ? null : contN.text);
+
+                            // TODO: Call API add_transaction.php here
+                            // final success = await _addTransactionToApi(tr);
+                            // if (success) {
+                            //   transactiondata.add(tr);
+                            //   Navigator.of(context).pop();
+                            // } else {
+                            //   _showError('Failed to save transaction');
+                            // }
+
+                            // For now, just add locally
+                            transactiondata.add(tr);
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            _showError('Error: $e');
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isSaving = false);
+                            }
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -146,10 +208,19 @@ class _AddTransactionState extends State<AddTransaction> {
                                 'Please fill amount, currency and type')));
                       }
                     },
-                    icon: const Icon(Icons.save_rounded),
-                    label: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 14.0),
-                        child: Text('Save')),
+                    icon: _isSaving
+                        ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                      ),
+                    )
+                        : const Icon(Icons.save_rounded),
+                    label: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 14.0),
+                        child: Text(_isSaving ? 'Saving...' : 'Save')),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigo,
                         foregroundColor: Colors.white,
@@ -169,8 +240,9 @@ class _AddTransactionState extends State<AddTransaction> {
               label: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 14.0),
                   child: Text('View all transactions')),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[200],
-                  foregroundColor: Colors.indigo,
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.indigo,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8))),
             ),
